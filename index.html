@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Scrolling</title>
+    <link rel="stylesheet" href="./index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter&family=Luckiest+Guy&family=Open+Sans&family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Infinite Scrolling for a DIV</h1>
+    <h3>Users Names</h3>
+    <div class="box-cont">
+        <div class="box"></div>
+    </div>
+</body>
+</html>
+<script>
+    const box = document.querySelector(".box");
+    let page = 1;
+    let limit = 10;
+    let count = 1;
+    let totalData
+    let currData = 0;
+
+    const nextPage = () => {
+        console.log(totalData)
+        console.log(currData)
+        if(totalData > currData){
+            // console.log("data get")
+            page++
+            getData(page)
+        }
+    }
+
+    box.addEventListener('scroll', () => {
+        const { scrollTop, scrollHeight, clientHeight } = document.querySelector(".box");
+        // console.log(scrollTop, scrollHeight, clientHeight)
+        if (scrollTop + clientHeight >= scrollHeight) {
+            // console.log("nextpage");
+            nextPage();
+        }
+    });
+
+    const loadData = (data) => {
+        for(let ele of data){
+            let name = document.createElement("p");
+            name.innerText = `${ count }-${ ele.firstName } ${ ele.lastName }`;
+            name.setAttribute("class", "text");
+            box.append(name);
+            count++
+        }
+        currData+=limit;
+    }
+    
+    const getData = async (page) => {
+        const response = await fetch(`https://dummyapi.io/data/v1/user?page=1&limit=${limit}`, {
+            method: "GET",
+            headers: {
+                "app-id": "61cf368692940278a4e038f6",
+            }
+        });
+        const { data, total } = await response.json();
+        totalData = total;
+        loadData(data);
+    }
+
+    getData(0);
+
+</script>
